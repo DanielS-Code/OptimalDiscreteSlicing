@@ -10,6 +10,7 @@ namespace OptimalDiscreteSlicing
     class Program
     {
 
+        static bool test = true;
 
         public Dictionary<Tuple<int, int>, Tuple<int, int>> optDiscreteSlicingAlgo(Dictionary<Tuple<int, int>, int> errorDic, HashSet<int> height, int N)
         {
@@ -75,18 +76,54 @@ namespace OptimalDiscreteSlicing
             return interList;
         }
 
-        public static Dictionary<Tuple<int, int>, int> calcError(Bitmap3 bmp)
+        public static Dictionary<Tuple<int, int>, int> calcError(Bitmap3 bmp,int tmax)
         {
-            Dictionary<Tuple<int,int>,int> ErrorDic = new Dictionary<Tuple<int,int>,int>();
+            Dictionary<Tuple<int, int>, int> ErrorDic = new Dictionary<Tuple<int, int>, int>();
             List<int> intersectionList;
-            for (int x=0; x<bmp.Dimensions.x; x++){
-                  for (int z=0; z<bmp.DimensiogetIntersectionsns.z; z++){
-                      intersectionList = getIntersections(x,z,bmp);
-                      calcErrorForFixedPosition(x,y,)
-                        for (int y=0; y<bmp.Dimensions.y; y++){
-
+            for (int x = 0; x < bmp.Dimensions.x; x++)
+            {
+                for (int z = 0; z < bmp.Dimensions.z; z++)
+                {                                                       //run for each x and z (2D looking from top of object)
+                    intersectionList = getIntersections(x, z, bmp);
+                    for (int k = 0; k < intersectionList.Count; k++)
+                    {
+                        //check for null pointer exception 
+                        int zi;
+                        if (k > 0)
+                        {
+                            zi = Math.Max(intersectionList[k] - tmax, intersectionList[k - 1]);
                         }
-                  }
+                        else
+                        {
+                            zi = intersectionList[k] - tmax;
+                        }
+                        for (; zi <= intersectionList[k]; zi++)
+                        { //check ranges!
+                            for (int zj = intersectionList[k]; zj <= zi + tmax; zj++)
+                            {
+                                int s = (int)Math.Pow(-1, k) * (zi - intersectionList[k]);
+                                int l = k + 1;
+                                while (intersectionList[l] < zj)
+                                {
+                                    s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - intersectionList[l]);
+                                    l++;
+                                }
+                                s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - zj);
+                                Tuple<int, int> key = new Tuple<int, int>(zi, zj);
+                                int error = zj - zi - s;
+                                if (ErrorDic.ContainsKey(key)) //check if need to add prev error
+                                {
+                                    ErrorDic[key] = ErrorDic[key] + error;
+                                }else{
+                                    ErrorDic[key] = error; 
+
+                                }
+                            }
+                        }
+                    }
+
+
+                }
             }
             return ErrorDic;
         }
@@ -113,16 +150,22 @@ namespace OptimalDiscreteSlicing
             {
                 float f = sdf[idx.x, idx.y, idx.z];
                 bmp.Set(idx, (f < 0) ? true : false);
-                //Console.WriteLine(idx);
                 //for bunny only removes bottom
                 if (idx.y < 8)
                 {
-                    //Vector3i v = new Vector3i();
-                    //v.x = 4;
-                    //v.y = 3;
-                    //v.z = 4;
-                    ////Console.WriteLine(bmp.Get(v));
                     bmp.Set(idx, false);
+                }
+
+                if (test) //take only one line from top
+                {
+                    if (idx.z != 50 || idx.x != 60)
+                    {
+                        bmp.Set(idx, false);
+                    }
+                    else
+                    {
+                        Console.WriteLine(bmp.Get(idx));
+                    }
                 }
 
             }
@@ -147,8 +190,12 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Hello Daniel");
             Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            //optDiscreteSlicingAlgo(calcError(bmp),....)
             printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+            if (test)
+            {
+                getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
+            }
+            //optDiscreteSlicingAlgo(calcError(bmp),....)
 
             //** voxels**//
 
@@ -166,6 +213,6 @@ namespace OptimalDiscreteSlicing
             //DMesh3 outputMesh = c.Mesh;
 
             //StandardMeshWriter.WriteMesh("C:\\Users\\Daniel\\Desktop\\output.obj", c.Mesh, WriteOptions.Defaults);
-        }
+            }
     }
 }
