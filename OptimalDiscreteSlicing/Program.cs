@@ -9,6 +9,12 @@ namespace OptimalDiscreteSlicing
 {
     class Program
     {
+
+        public void optDiscreteSlicingAlgo(Dictionary<Tuple<int, int>, int> errorDic, HashSet<int> height,int tMax, int N,List<List<int>> E,)  )
+        {
+
+        }
+
         static Dictionary<Tuple<int, int>, int> ErrorCalculation()
         {
             Dictionary<Tuple<int,int>,int> ErrorDic = new Dictionary<Tuple<int,int>,int>();
