@@ -10,17 +10,42 @@ namespace OptimalDiscreteSlicing
     class Program
     {
 
-        public void optDiscreteSlicingAlgo(Dictionary<Tuple<int, int>, int> errorDic, HashSet<int> height,int tMax, int N,List<List<int>> E,)  )
-        {
 
+        public static List<int> getIntersections(int x, int z, Bitmap3 bmp)
+        {
+            List<int> interList = new List<int>();
+            bool inShape = false;
+            for (int y = 0; y < bmp.Dimensions.y; y++)
+            {
+                //we were out of shape and now going in shape
+                if (bmp.Get(getCordinate(x, y, z)) == true && inShape == false)
+                {
+                    inShape = true;
+                    interList.Add(y);
+                }
+                //we were in shape and now going out of shape
+                if (bmp.Get(getCordinate(x, y, z)) == false && inShape == true)
+                {
+                    inShape = false; 
+                    interList.Add(y);
+                }   
+            }
+            return interList;
         }
 
-        static Dictionary<Tuple<int, int>, int> ErrorCalculation()
+        public static Dictionary<Tuple<int, int>, int> calcError(Bitmap3 bmp)
         {
             Dictionary<Tuple<int,int>,int> ErrorDic = new Dictionary<Tuple<int,int>,int>();
-            
-            
-            
+            List<int> intersectionList;
+            for (int x=0; x<bmp.Dimensions.x; x++){
+                  for (int z=0; z<bmp.DimensiogetIntersectionsns.z; z++){
+                      intersectionList = (x,z,bmp);
+                      calcErrorForFixedPosition(x,y,)
+                        for (int y=0; y<bmp.Dimensions.y; y++){
+
+                        }
+                  }
+            }
             return ErrorDic;
         }
 
@@ -41,15 +66,15 @@ namespace OptimalDiscreteSlicing
 
             //** voxels**//
             Bitmap3 bmp = new Bitmap3(sdf.Dimensions);
+            Console.WriteLine(bmp.Dimensions.x + " " + bmp.Dimensions.y +" "+ bmp.Dimensions.z);
             foreach (Vector3i idx in bmp.Indices())
             {
                 float f = sdf[idx.x, idx.y, idx.z];
                 bmp.Set(idx, (f < 0) ? true : false);
-                Console.WriteLine(idx);
+                //Console.WriteLine(idx);
                 //for bunny only removes bottom
                 if (idx.y < 8)
                 {
-                    ////Console.WriteLine(bmp.Dimensions);
                     //Vector3i v = new Vector3i();
                     //v.x = 4;
                     //v.y = 3;
@@ -57,8 +82,9 @@ namespace OptimalDiscreteSlicing
                     ////Console.WriteLine(bmp.Get(v));
                     bmp.Set(idx, false);
                 }
+
             }
-            return bmp;
+                return bmp;
         }
 
         static void printVoxelizedRepresentation(Bitmap3 bmp, String outputPath){
@@ -78,6 +104,7 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Hello Daniel");
             Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
+            //optDiscreteSlicingAlgo(calcError(bmp),....)
             printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
 
             //** voxels**//
