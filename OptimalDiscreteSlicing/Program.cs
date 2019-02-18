@@ -39,7 +39,7 @@ namespace OptimalDiscreteSlicing
             {
                 float f = sdf[idx.x, idx.y, idx.z];
                 bmp.Set(idx, (f < 0) ? true : false);
-                
+                Console.WriteLine(idx);
                 //for bunny only removes bottom
                 if (idx.y < 8)
                 {
@@ -58,10 +58,10 @@ namespace OptimalDiscreteSlicing
         static void printVoxelizedRepresentation(Bitmap3 bmp, String outputPath){
             VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
             voxGen.Voxels = bmp;
-            voxGen.ColorSourceF = (idx) =>
-            {
-                return new Colorf((float)idx.x, (float)idx.y, (float)idx.z) * (1.0f / 4);
-            };
+            //voxGen.ColorSourceF = (idx) =>
+            //{
+            //    return new Colorf((float)idx.x, (float)idx.y, (float)idx.z) * (1.0f / 4);
+            //};
             voxGen.Generate();
             DMesh3 voxMesh = voxGen.Meshes[0];
             Util.WriteDebugMesh(voxMesh, outputPath);
