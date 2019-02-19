@@ -140,13 +140,13 @@ namespace OptimalDiscreteSlicing
             for (int y = 0; y < bmp.Dimensions.y; y++)
             {
                 //we were out of shape and now going in shape
-                if (bmp.Get(getCordinate(x, y, z)) == true && inShape == false)
+                if (bmp.Get(createVector(x, y, z)) == true && inShape == false)
                 {
                     inShape = true;
                     interList.Add(y);
                 }
                 //we were in shape and now going out of shape
-                if (bmp.Get(getCordinate(x, y, z)) == false && inShape == true)
+                if (bmp.Get(createVector(x, y, z)) == false && inShape == true)
                 {
                     inShape = false;
                     interList.Add(y);
@@ -183,7 +183,7 @@ namespace OptimalDiscreteSlicing
                             {
                                 int s = (int)Math.Pow(-1, k) * (zi - intersectionList[k]);
                                 int l = k + 1;
-                                while (intersectionList[l] < zj)
+                                while (l<intersectionList.Count && intersectionList[l] < zj)
                                 {
                                     s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - intersectionList[l]);
                                     l++;
@@ -209,7 +209,7 @@ namespace OptimalDiscreteSlicing
             return new Tuple<Dictionary<Tuple<int,int>,int>,Dictionary<Tuple<int,int,int,int>,int>>(errorDic,sumDic);
         }
 
-        public static Vector3i getCordinate(int x, int y, int z)
+        public static Vector3i createVector(int x, int y, int z)
         {
             return new Vector3i(x, y, z);
         }
@@ -266,6 +266,30 @@ namespace OptimalDiscreteSlicing
             Util.WriteDebugMesh(voxMesh, outputPath);
         }
 
+        public static Bitmap3 createNewObjectForPriniting( List<int> path ,Dictionary<Tuple<int, int, int, int>, int> sumDic,Vector3i newObjDim){
+            Bitmap3 voxPrintResult = new Bitmap3(newObjDim);
+            foreach (Vector3i idx in voxPrintResult.Indices()) //initialize object
+            {
+                voxPrintResult.Set(idx, false);
+            }
+            for (int i =0; i<path.Count-1; i++){ //-1 because we want to take every time the range Zj to Zi where Zj > Zi
+                int zj = path[i];
+                int zi = path[i+1];
+                for (int x=0; x<voxPrintResult.Dimensions.x; x++){
+                    for(int z=0; z<voxPrintResult.Dimensions.z; z++){
+                        Tuple<int,int,int,int> key = new Tuple<int,int,int,int>(zi,zj,x,z);
+                        if(sumDic.ContainsKey(key) && sumDic[key]>=0){
+                             for(int y=zi; y<=zj; y++)
+                             {
+                                  voxPrintResult.Set(createVector(x,y,z),true);
+                             }
+                        }
+                    }
+                }
+            }
+            return voxPrintResult; 
+        }
+
         static void Main(string[] args)
         {
 
@@ -273,7 +297,7 @@ namespace OptimalDiscreteSlicing
             HashSet<int> legitSliceHights = new HashSet<int>;
             legitSliceHights.Add(2);
             Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
@@ -282,24 +306,22 @@ namespace OptimalDiscreteSlicing
             Dictionary<Tuple<int, int>, Tuple<int, int>> algResults =  optDiscreteSlicingAlgo(errorAndSum.Item1,legitSliceHights,bmp.Dimensions.y);
             Tuple<int, int> startPoint = findStartPoint(algResults,bmp.Dimensions.y,legitSliceHights.Max(),legitSliceHights.Min());
             List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //frop top to bottom
-            createNewObjectForPriniting(path,errorAndSum.Item2);
+            Vector3i newObjDim = createVector(bmp.Dimensions.x,path.First()-path.Last(),bmp.Dimensions.z);
+            Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
+            printVoxelizedRepresentation(outputObj,"C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+
+
+
             //optDiscreteSlicingAlgo(calcError(bmp),....)
-
             //** voxels**//
-
-
             //var iso = new DenseGridTrilinearImplicit(sdf.Grid, sdf.GridOrigin, sdf.CellSize);
-
             //MarchingCubes c = new MarchingCubes();
             //c.Implicit = iso;
             //c.Bounds = mesh.CachedBounds;
-
             //c.CubeSize = c.Bounds.MaxDim / 128;
             //c.Bounds.Expand(3 * c.CubeSize);
             //c.Generate();
-
             //DMesh3 outputMesh = c.Mesh;
-
             //StandardMeshWriter.WriteMesh("C:\\Users\\Daniel\\Desktop\\output.obj", c.Mesh, WriteOptions.Defaults);
             }
     }
