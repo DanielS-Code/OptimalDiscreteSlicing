@@ -294,7 +294,7 @@ namespace OptimalDiscreteSlicing
         {
 
             Console.WriteLine("Insert T");
-            HashSet<int> legitSliceHights = new HashSet<int>;
+            HashSet<int> legitSliceHights = new HashSet<int>();
             legitSliceHights.Add(2);
             Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
             printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
