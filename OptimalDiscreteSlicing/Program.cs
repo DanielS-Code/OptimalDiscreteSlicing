@@ -37,31 +37,32 @@ namespace OptimalDiscreteSlicing
                     foreach (int t in height)
                     {
                         TupleDInt tmpNew = new TupleDInt(m - 1, y - t);
+
                         TupleDInt tmp1 = new TupleDInt(y - t, y);
                         TupleDInt tmp2 = new TupleDInt(m, y);
                         var errFromDic = -1;
                         var errInit = -1;
-                        if (y - t < 0)
-                        {
-                            errInit = 0;
-                        }
-                        else
-                        {
+                       // if (y - t < 0)
+                        //{
+                          //  errInit = 0;
+                        //}
+                        //else
+                        //{
                             if (E.ContainsKey(tmpNew)) { errInit = E[tmpNew]; }
                             else errInit = int.MaxValue;
 
-                        }
-                        if (errorDic.ContainsKey(tmp1))
-                        {
+                        //}
+                       // if (errorDic.ContainsKey(tmp1))
+                        //{
                             errFromDic = errorDic[tmp1];
 
 
-                            if (errInit + errFromDic < E[tmp2])
+                            if (errInit + errFromDic < E[tmp2] && errInit!= int.MaxValue)
                             {
                                 phi[tmp2] = t;
                                 E[tmp2] = errInit + errFromDic;
                             }
-                        }
+                        //}
                     }
                 }
             }
@@ -178,6 +179,11 @@ namespace OptimalDiscreteSlicing
                 {
                     inShape = false;
                     interList.Add(y);
+                }
+                //obj reaches the pick
+                if (bmp.Get(createVector(x, y, z)) == true && y == bmp.Dimensions.y - 1)
+                {
+                    interList.Add(y + 1);
                 }
             }
             return interList;
@@ -325,8 +331,8 @@ namespace OptimalDiscreteSlicing
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
             legitSliceHights.Add(2);
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
