@@ -14,7 +14,7 @@ namespace OptimalDiscreteSlicing
 
         public Dictionary<Tuple<int, int>, Tuple<int, int>> optDiscreteSlicingAlgo(Dictionary<Tuple<int, int>, int> errorDic, HashSet<int> height, int N)
         {
-            Dictionary<Tuple<int, int>, Tuple<int, int>> ETmz_t_err = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
+            Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
             List<List<int>> E = new List<List<int>>();
             List<List<int>> phi = new List<List<int>>();
             int tMax = height.Max();
@@ -45,13 +45,92 @@ namespace OptimalDiscreteSlicing
                 {
                     var tuple = new Tuple<int, int>(m, y);
                     var value = new Tuple<int, int>(E[m][y], phi[m][y]);
-                    ETmz_t_err[tuple] = value;
+                    ETmy_t_err[tuple] = value;
                 }
             }
 
-            return ETmz_t_err;
+            return ETmy_t_err;
 
         }
+        public Tuple<int, int> findStartPoint(Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int N, int tMax, int tMin)
+        {
+            int y = N;
+            int minErr = -1;
+            bool firstIter = true;
+            int yMin = -1;
+            int mMin = -1;
+            for (; y <= N + tMax - 1; y++)
+            {
+                for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
+                {
+                    if (firstIter)
+                    {
+                        Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                        if (ETmy_t_err[tmp] != null)//CHECK IT!!!! IF null or -1???
+                        {
+                            minErr = ETmy_t_err[tmp].Item2;
+                            firstIter = false;
+                            yMin = y;
+                            mMin = m;
+
+                        }
+
+                    }
+                    else
+                    {
+                        Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                        if (minErr > ETmy_t_err[tmp].Item2)
+                        {
+                            minErr = ETmy_t_err[tmp].Item2;
+                            yMin = y;
+                            mMin = m;
+                        }
+                    }
+                }
+            }
+            Tuple<int, int> retVal = new Tuple<int, int>(mMin, yMin);
+
+            return retVal;
+        }
+        public int getOptMperConstY(Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int y, int tMin, int N)
+        {
+            int mOpt = -1;
+            int minErr = -1;
+            for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
+            {
+                Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                if (ETmy_t_err[tmp] != null)
+                {//CHECK IT!!!! IF null or -1???
+                    if (minErr > ETmy_t_err[tmp].Item2)
+                    {
+                        mOpt = m;
+                    }
+                }
+            }
+            return mOpt;
+        }
+        public List<int> getOptSlice(Tuple<int, int> startPoint, Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int tMin, int N)
+        {
+            List<int> path = new List<int>();
+            Tuple<int, int> tmp = new Tuple<int, int>(startPoint.Item1, startPoint.Item2);
+            int yNew = startPoint.Item2;
+            int mNew = -1;
+            Boolean first = true;
+            path.Add(startPoint.Item2);
+
+
+            while (yNew != 1 || first)//Check if stop on 1 or 0!
+            {
+
+                yNew = yNew - ETmy_t_err[tmp].Item2; //z-t
+                mNew = getOptMperConstY(ETmy_t_err, yNew, tMin, N);
+                path.Add(yNew);
+                if (first) first = false; else first = false;
+                tmp = new Tuple<int, int>(mNew, yNew);
+            }
+            return path;
+        }
+
 
 
         public static List<int> getIntersections(int x, int z, Bitmap3 bmp)
@@ -121,8 +200,6 @@ namespace OptimalDiscreteSlicing
                             }
                         }
                     }
-
-
                 }
             }
             return ErrorDic;
