@@ -310,19 +310,6 @@ namespace OptimalDiscreteSlicing
             Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
             printVoxelizedRepresentation(outputObj,"C:\\Users\\Daniel\\Desktop\\outputVox.obj");
 
-
-
-            //optDiscreteSlicingAlgo(calcError(bmp),....)
-            //** voxels**//
-            //var iso = new DenseGridTrilinearImplicit(sdf.Grid, sdf.GridOrigin, sdf.CellSize);
-            //MarchingCubes c = new MarchingCubes();
-            //c.Implicit = iso;
-            //c.Bounds = mesh.CachedBounds;
-            //c.CubeSize = c.Bounds.MaxDim / 128;
-            //c.Bounds.Expand(3 * c.CubeSize);
-            //c.Generate();
-            //DMesh3 outputMesh = c.Mesh;
-            //StandardMeshWriter.WriteMesh("C:\\Users\\Daniel\\Desktop\\output.obj", c.Mesh, WriteOptions.Defaults);
             }
     }
 }
