@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ErrDic = System.Collections.Generic.Dictionary<System.Tuple<int, int>, System.Tuple<int, int>>;
+using TupleDInt = System.Tuple<int, int>;
+using TupleErr_Sum = System.Tuple<System.Collections.Generic.Dictionary<System.Tuple<int, int>, int>, System.Collections.Generic.Dictionary<System.Tuple<int, int, int, int>, int>>;
 
 namespace OptimalDiscreteSlicing
 {
@@ -305,11 +308,11 @@ namespace OptimalDiscreteSlicing
             Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp,legitSliceHights.Max());
             Dictionary<Tuple<int, int>, Tuple<int, int>> algResults =  optDiscreteSlicingAlgo(errorAndSum.Item1,legitSliceHights,bmp.Dimensions.y);
             Tuple<int, int> startPoint = findStartPoint(algResults,bmp.Dimensions.y,legitSliceHights.Max(),legitSliceHights.Min());
-            List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //frop top to bottom
+            List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x,path.First()-path.Last(),bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
             printVoxelizedRepresentation(outputObj,"C:\\Users\\Daniel\\Desktop\\outputVox.obj");
 
-            }
+         }
     }
 }
