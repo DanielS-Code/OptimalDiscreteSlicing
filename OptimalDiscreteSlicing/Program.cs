@@ -15,30 +15,53 @@ namespace OptimalDiscreteSlicing
 
         static bool test = true;
 
-        public static Dictionary<Tuple<int, int>, Tuple<int, int>> optDiscreteSlicingAlgo(Dictionary<Tuple<int, int>, int> errorDic, HashSet<int> height, int N)
+        public static ErrDic optDiscreteSlicingAlgo(Dictionary<TupleDInt, int> errorDic, HashSet<int> height, int N)
         {
-            Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
-            List<List<int>> E = new List<List<int>>();
-            List<List<int>> phi = new List<List<int>>();
+            ErrDic ETmy_t_err = new ErrDic();
+            Dictionary<Tuple<int, int>, int> E = new Dictionary<TupleDInt, int>();
+            Dictionary<Tuple<int, int>, int> phi = new Dictionary<Tuple<int, int>, int>();
             int tMax = height.Max();
             int tMin = height.Min();
+
             for (int y = 1 - tMax; y <= 0; y++)
             {
-                E[0][y] = 0;
+                TupleDInt tmp = new TupleDInt(0, y);
+                E[tmp] = 0;
             }
             for (int y = 1; y <= N + tMax - 1; y++)
             {
-                for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
+                for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)) + 1; m++)
                 {
-                    E[m][y] = int.MaxValue;//inf
+                    TupleDInt tmp = new TupleDInt(m, y);
+                    E[tmp] = int.MaxValue;//inf
                     foreach (int t in height)
                     {
-                        if (E[m - 1][y - t] + E[y - t][y] < E[m][y])
+                        TupleDInt tmpNew = new TupleDInt(m - 1, y - t);
+                        TupleDInt tmp1 = new TupleDInt(y - t, y);
+                        TupleDInt tmp2 = new TupleDInt(m, y);
+                        var errFromDic = -1;
+                        var errInit = -1;
+                        if (y - t < 0)
                         {
-                            phi[m][y] = t;
-                            E[m][y] = E[m - 1][y - t] + E[y - t][y];
+                            errInit = 0;
                         }
+                        else
+                        {
+                            if (E.ContainsKey(tmpNew)) { errInit = E[tmpNew]; }
+                            else errInit = int.MaxValue;
 
+                        }
+                        if (errorDic.ContainsKey(tmp1))
+                        {
+                            errFromDic = errorDic[tmp1];
+
+
+                            if (errInit + errFromDic < E[tmp2])
+                            {
+                                phi[tmp2] = t;
+                                E[tmp2] = errInit + errFromDic;
+                            }
+                        }
                     }
                 }
             }
@@ -46,8 +69,10 @@ namespace OptimalDiscreteSlicing
             {
                 for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
                 {
-                    var tuple = new Tuple<int, int>(m, y);
-                    var value = new Tuple<int, int>(E[m][y], phi[m][y]);
+                    TupleDInt tmp2 = new TupleDInt(m, y);
+
+                    var tuple = new TupleDInt(m, y);
+                    var value = new TupleDInt(E[tmp2], phi[tmp2]);
                     ETmy_t_err[tuple] = value;
                 }
             }
@@ -248,6 +273,7 @@ namespace OptimalDiscreteSlicing
                     }
                     else
                     {
+                        bmp.Set(idx,true);
                         Console.WriteLine(bmp.Get(idx));
                     }
                 }
