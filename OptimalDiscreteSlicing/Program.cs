@@ -383,7 +383,7 @@ namespace OptimalDiscreteSlicing
         static void Main(string[] args)
         {
           
-            Console.WriteLine("Enter path of model: ");
+            Console.WriteLine("Path: ");
             string pathToFile = Console.ReadLine();
             Console.WriteLine("Weight Mode?(Y/N): ");
             string answer = Console.ReadLine();
