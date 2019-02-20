@@ -13,7 +13,7 @@ namespace OptimalDiscreteSlicing
     class Program
     {
 
-        static bool test =true;
+        static bool test = false;
 
         public static ErrDic optDiscreteSlicingAlgo(Dictionary<TupleDInt, int> errorDic, HashSet<int> height, int N)
         {
@@ -102,40 +102,41 @@ namespace OptimalDiscreteSlicing
 
                 //for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
                 //{
-                if (kk.Item2 >= y && kk.Item2 <= N + tMax - 1) { 
-
-                if (firstIter)
+                if (kk.Item2 >= y && kk.Item2 <= N + tMax - 1)
                 {
-                    //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
-                    //if (ETmy_t_err[tmp] != null)//CHECK IT!!!! IF null or -1???
-                    //{
-                        minErr = ETmy_t_err[kk].Item2;
-                        firstIter = false;
-                        yMin = kk.Item2;
-                        mMin = kk.Item1;
 
-                    //}
-
-                }
-                else
-                {
-                    //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
-                    if (minErr > ETmy_t_err[kk].Item2)
+                    if (firstIter)
                     {
+                        //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                        //if (ETmy_t_err[tmp] != null)//CHECK IT!!!! IF null or -1???
+                        //{
                         minErr = ETmy_t_err[kk].Item2;
                         firstIter = false;
                         yMin = kk.Item2;
                         mMin = kk.Item1;
+
+                        //}
+
+                    }
+                    else
+                    {
+                        //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                        if (minErr > ETmy_t_err[kk].Item2)
+                        {
+                            minErr = ETmy_t_err[kk].Item2;
+                            firstIter = false;
+                            yMin = kk.Item2;
+                            mMin = kk.Item1;
+                        }
                     }
                 }
-            }
             }
             Tuple<int, int> retVal = new Tuple<int, int>(mMin, yMin);
 
             return retVal;
         }
-       
-        
+
+
         public static int getOptMperConstY(Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int y, int tMin, int N)
         {
             int mOpt = -1;
@@ -147,16 +148,17 @@ namespace OptimalDiscreteSlicing
 
                 //for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
                 //{
-              
 
-                  //  for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
-            //{
-               // Tuple<int, int> tmp = new Tuple<int, int>(m, y);
-                if (kk.Item2 == y) {
-                    if (first) { minErr = ETmy_t_err[kk].Item2;mOpt = kk.Item1;first = false; }
-               //if (ETmy_t_err[tmp] != null)
-                //{//CHECK IT!!!! IF null or -1???
-                   else if (minErr > ETmy_t_err[kk].Item2)
+
+                //  for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
+                //{
+                // Tuple<int, int> tmp = new Tuple<int, int>(m, y);
+                if (kk.Item2 == y)
+                {
+                    if (first) { minErr = ETmy_t_err[kk].Item2; mOpt = kk.Item1; first = false; }
+                    //if (ETmy_t_err[tmp] != null)
+                    //{//CHECK IT!!!! IF null or -1???
+                    else if (minErr > ETmy_t_err[kk].Item2)
                     {
                         mOpt = kk.Item1;
                     }
@@ -179,7 +181,7 @@ namespace OptimalDiscreteSlicing
             path.Add(startPoint.Item2);
 
 
-            while (yNew >1 || first)//Check if stop on 1 or 0!
+            while (yNew > 1 || first)//Check if stop on 1 or 0!
             {
 
                 yNew = yNew - ETmy_t_err[tmp].Item2; //z-t
@@ -227,21 +229,21 @@ namespace OptimalDiscreteSlicing
             List<int> intersectionList;
 
             //zerro all errors
-            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y+tmax; zi++)
-            { 
-                for (int zj = zi; zj <= Math.Min(zi + tmax,bmp.Dimensions.y+tmax); zj++)
+            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y + tmax; zi++)
+            {
+                for (int zj = zi; zj <= Math.Min(zi + tmax, bmp.Dimensions.y + tmax); zj++)
                 {
                     Tuple<int, int> key = new Tuple<int, int>(zi, zj);
                     errorDic[key] = 0;
                 }
             }
-            int sss = 0;
+
             //run for each x and z (2D looking from top of object)
             for (int x = 0; x < bmp.Dimensions.x; x++)
             {
                 for (int z = 0; z < bmp.Dimensions.z; z++)
-                {                                            
-                  //calculate error and sum for specific x and y
+                {
+                    //calculate error and sum for specific x and y
                     intersectionList = getIntersections(x, z, bmp);
                     for (int k = 0; k < intersectionList.Count; k++)
                     {
@@ -261,13 +263,13 @@ namespace OptimalDiscreteSlicing
                             {
                                 int s = (int)Math.Pow(-1, k) * (zi - intersectionList[k]);
                                 int l = k + 1;
-                                while (l<intersectionList.Count && intersectionList[l] < zj)
+                                while (l < intersectionList.Count && intersectionList[l] < zj)
                                 {
                                     s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - intersectionList[l]);
                                     l++;
                                 }
                                 s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - zj);
-                                Tuple<int, int, int, int> sumKey = new Tuple<int,int,int,int>(zi,zj,x,z);
+                                Tuple<int, int, int, int> sumKey = new Tuple<int, int, int, int>(zi, zj, x, z);
                                 Tuple<int, int> key = new Tuple<int, int>(zi, zj);
                                 if (!sumDic.ContainsKey(sumKey)) //CHECK THIS OUT IT LOOKS BAD!!! (IN THE LOOK WE REPEAT CALCULATION FOR ZI,ZJ,X,Z!!!!
                                 {
@@ -280,15 +282,15 @@ namespace OptimalDiscreteSlicing
                                     else
                                     {
                                         errorDic[key] = error;
-                                    }    
-                                }                     
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-                    
-            return new Tuple<Dictionary<Tuple<int,int>,int>,Dictionary<Tuple<int,int,int,int>,int>>(errorDic,sumDic);
+
+            return new Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>>(errorDic, sumDic);
         }
 
         public static Vector3i createVector(int x, int y, int z)
@@ -327,7 +329,7 @@ namespace OptimalDiscreteSlicing
                     }
                     else
                     {
-                        bmp.Set(idx,true);
+                        bmp.Set(idx, true);
                         Console.WriteLine(bmp.Get(idx));
                     }
                 }
@@ -349,28 +351,45 @@ namespace OptimalDiscreteSlicing
             Util.WriteDebugMesh(voxMesh, outputPath);
         }
 
-        public static Bitmap3 createNewObjectForPriniting( List<int> path ,Dictionary<Tuple<int, int, int, int>, int> sumDic,Vector3i newObjDim){
+        public static bool isCoulumnInObj(Bitmap3 bmp, int zi, int zj, int x, int z)
+        {
+            for (int y = zi; y <= zj; y++)
+            {
+                if (!bmp.Get(createVector(x, y, z)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static Bitmap3 createNewObjectForPriniting(List<int> path, Dictionary<Tuple<int, int, int, int>, int> sumDic, Vector3i newObjDim, Bitmap3 oldObj)
+        {
             Bitmap3 voxPrintResult = new Bitmap3(newObjDim);
             foreach (Vector3i idx in voxPrintResult.Indices()) //initialize object
             {
                 voxPrintResult.Set(idx, false);
             }
-            for (int i =0; i<path.Count-1; i++){ //-1 because we want to take every time the range Zj to Zi where Zj > Zi
+            for (int i = 0; i < path.Count - 1; i++)
+            { //-1 because we want to take every time the range Zj to Zi where Zj > Zi
                 int zj = path[i];
-                int zi = path[i+1];
-                for (int x=0; x<voxPrintResult.Dimensions.x; x++){
-                    for(int z=0; z<voxPrintResult.Dimensions.z; z++){
-                        Tuple<int,int,int,int> key = new Tuple<int,int,int,int>(zi,zj,x,z);
-                        if(sumDic.ContainsKey(key) && sumDic[key]>=0){
-                             for(int y=zi; y<=zj; y++)
-                             {
-                                  voxPrintResult.Set(createVector(x,y,z),true);
-                             }
+                int zi = path[i + 1];
+                for (int x = 0; x < voxPrintResult.Dimensions.x; x++)
+                {
+                    for (int z = 0; z < voxPrintResult.Dimensions.z; z++)
+                    {
+                        Tuple<int, int, int, int> key = new Tuple<int, int, int, int>(zi, zj, x, z);
+                        if ((sumDic.ContainsKey(key) && sumDic[key] >= 0) || isCoulumnInObj(oldObj, zi, zj, x, z))
+                        {
+                            for (int y = zi; y <= zj; y++)
+                            {
+                                voxPrintResult.Set(createVector(x, y, z), true);
+                            }
                         }
                     }
                 }
             }
-            return voxPrintResult; 
+            return voxPrintResult;
         }
 
         static void Main(string[] args)
@@ -378,24 +397,24 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
-          // legitSliceHights.Add(2);
-            legitSliceHights.Add(5);
+            legitSliceHights.Add(7);
+            legitSliceHights.Add(3);
             //legitSliceHights.Add(7);
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
             if (test)
             {
-                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
+                getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
             }
-            Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp,legitSliceHights.Max(),legitSliceHights.Min());
-           
-            Dictionary<Tuple<int, int>, Tuple<int, int>> algResults =  optDiscreteSlicingAlgo(errorAndSum.Item1,legitSliceHights,bmp.Dimensions.y);
-            Tuple<int, int> startPoint = findStartPoint(algResults,bmp.Dimensions.y,legitSliceHights.Max(),legitSliceHights.Min());
-            List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //from top to bottom
-            Vector3i newObjDim = createVector(bmp.Dimensions.x,path.First()-path.Last(),bmp.Dimensions.z);
-            Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
-            printVoxelizedRepresentation(outputObj, "C:\\Users\\VladKo\\Downloads\\outputVox.obj");
+            Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp, legitSliceHights.Max(), legitSliceHights.Min());
 
-         }
+            Dictionary<Tuple<int, int>, Tuple<int, int>> algResults = optDiscreteSlicingAlgo(errorAndSum.Item1, legitSliceHights, bmp.Dimensions.y);
+            Tuple<int, int> startPoint = findStartPoint(algResults, bmp.Dimensions.y, legitSliceHights.Max(), legitSliceHights.Min());
+            List<int> path = getOptSlice(startPoint, algResults, legitSliceHights.Min(), bmp.Dimensions.y); //from top to bottom
+            Vector3i newObjDim = createVector(bmp.Dimensions.x, path.First() - path.Last(), bmp.Dimensions.z);
+            Bitmap3 outputObj = createNewObjectForPriniting(path, errorAndSum.Item2, newObjDim, bmp);
+            printVoxelizedRepresentation(outputObj, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+
+        }
     }
 }
