@@ -415,19 +415,31 @@ namespace OptimalDiscreteSlicing
 
         static void Main(string[] args)
         {
-
-            Console.WriteLine("Insert T");
-            HashSet<int> legitSliceHights = new HashSet<int>();
+            //string input=" ";
+            Console.WriteLine("Insert T: ");
+            string s = Console.ReadLine();
+            List<int> input = s.Split(' ').Select(t => Convert.ToInt32(t)).ToList<int>();
+            /*
+            while (input != "")
+            {
+                Console.WriteLine("Please enter another integer: ");
+                input = Console.ReadLine().In;
+               
+                int.TryParse(input, out value))
+                numbersInput.Add(input);
+            }
+            */
+            HashSet<int> legitSliceHights = new HashSet<int>(input);
            // legitSliceHights.Add(17);
             //legitSliceHights.Add(3);
            //legitSliceHights.Add(2);
-            legitSliceHights.Add(4);
-            legitSliceHights.Add(5);
-            legitSliceHights.Add(9);
+           // legitSliceHights.Add(4);
+            //legitSliceHights.Add(5);
+            //legitSliceHights.Add(9);
             //legitSliceHights.Add(12);
 
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
@@ -439,7 +451,7 @@ namespace OptimalDiscreteSlicing
             List<int> path = getOptSlice(startPoint, algResults, legitSliceHights.Min(), bmp.Dimensions.y); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x, path.First() - path.Last(), bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path, errorAndSum.Item2, newObjDim, bmp);
-            printVoxelizedRepresentation(outputObj, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+            printVoxelizedRepresentation(outputObj, "C:\\Users\\VladKo\\Downloads\\outputVox.obj");
 
         }
     }
