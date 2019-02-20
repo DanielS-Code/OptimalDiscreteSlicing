@@ -81,7 +81,7 @@ namespace OptimalDiscreteSlicing
             */
             foreach (TupleDInt tpl in phi.Keys)
             {
-                var value = new TupleDInt(E[tpl], phi[tpl]);
+                var value = new TupleDInt(phi[tpl], E[tpl]);
                 ETmy_t_err[tpl] = value;
             }
             return ETmy_t_err;
@@ -184,7 +184,7 @@ namespace OptimalDiscreteSlicing
             while (yNew > 1 || first)//Check if stop on 1 or 0!
             {
 
-                yNew = yNew - ETmy_t_err[tmp].Item2; //z-t
+                yNew = yNew - ETmy_t_err[tmp].Item1; //z-t
                 mNew = getOptMperConstY(ETmy_t_err, yNew, tMin, N);
                 path.Add(yNew);
                 if (first) first = false; else first = false;
@@ -192,7 +192,6 @@ namespace OptimalDiscreteSlicing
             }
             return path;
         }
-
 
 
         public static List<int> getIntersections(int x, int z, Bitmap3 bmp)
@@ -397,11 +396,13 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
+           // legitSliceHights.Add(17);
+           //legitSliceHights.Add(3);
+           //legitSliceHights.Add(2);
             legitSliceHights.Add(7);
-            legitSliceHights.Add(3);
-            //legitSliceHights.Add(7);
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
+            legitSliceHights.Add(10);
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
@@ -413,7 +414,7 @@ namespace OptimalDiscreteSlicing
             List<int> path = getOptSlice(startPoint, algResults, legitSliceHights.Min(), bmp.Dimensions.y); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x, path.First() - path.Last(), bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path, errorAndSum.Item2, newObjDim, bmp);
-            printVoxelizedRepresentation(outputObj, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+            printVoxelizedRepresentation(outputObj, "C:\\Users\\VladKo\\Downloads\\outputVox.obj");
 
         }
     }
