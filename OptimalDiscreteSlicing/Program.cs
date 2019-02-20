@@ -14,7 +14,7 @@ namespace OptimalDiscreteSlicing
     {
 
         static bool test = false;
-
+        static bool weightsOn = false;
         public static ErrDic optDiscreteSlicingAlgo(Dictionary<TupleDInt, int> errorDic, HashSet<int> height, int N)
         {
             ErrDic ETmy_t_err = new ErrDic();
@@ -42,18 +42,10 @@ namespace OptimalDiscreteSlicing
                         TupleDInt tmp2 = new TupleDInt(m, y);
                         var errFromDic = -1;
                         var errInit = -1;
-                        // if (y - t < 0)
-                        //{
-                        //  errInit = 0;
-                        //}
-                        //else
-                        //{
+                     
                         if (E.ContainsKey(tmpNew)) { errInit = E[tmpNew]; }
                         else errInit = int.MaxValue;
 
-                        //}
-                        // if (errorDic.ContainsKey(tmp1))
-                        //{
                         errFromDic = errorDic[tmp1];//134 136
 
 
@@ -62,23 +54,10 @@ namespace OptimalDiscreteSlicing
                             phi[tmp2] = t;
                             E[tmp2] = errInit + errFromDic;
                         }
-                        //}
+                       
                     }
                 }
-            }
-            /*
-            for (int y = 1; y <= N + tMax - 1; y++)
-            {
-                for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
-                {
-                    TupleDInt tmp2 = new TupleDInt(m, y);
-
-                    var tuple = new TupleDInt(m, y);
-                    var value = new TupleDInt(E[tmp2], phi[tmp2]);
-                    ETmy_t_err[tuple] = value;
-                }
-            }
-            */
+            }            
             foreach (TupleDInt tpl in phi.Keys)
             {
                 var value = new TupleDInt(phi[tpl], E[tpl]);
@@ -94,33 +73,21 @@ namespace OptimalDiscreteSlicing
             bool firstIter = true;
             int yMin = -1;
             int mMin = -1;
-            // for (; y <= N + tMax - 1; y++)
-            //{
+           
             foreach (TupleDInt kk in ETmy_t_err.Keys)
             {
-
-
-                //for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
-                //{
                 if (kk.Item2 >= y && kk.Item2 <= N + tMax - 1)
                 {
 
                     if (firstIter)
-                    {
-                        //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
-                        //if (ETmy_t_err[tmp] != null)//CHECK IT!!!! IF null or -1???
-                        //{
+                    {                     
                         minErr = ETmy_t_err[kk].Item2;
                         firstIter = false;
                         yMin = kk.Item2;
-                        mMin = kk.Item1;
-
-                        //}
-
+                        mMin = kk.Item1;                  
                     }
                     else
                     {
-                        //Tuple<int, int> tmp = new Tuple<int, int>(m, y);
                         if (minErr > ETmy_t_err[kk].Item2)
                         {
                             minErr = ETmy_t_err[kk].Item2;
@@ -137,30 +104,34 @@ namespace OptimalDiscreteSlicing
         }
 
 
-        public static int getOptMperConstY(Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int y, int tMin, int N)
+        public static int getOptMperConstY(Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int y, int tMin, int N, Dictionary<int, double> weights)
         {
             int mOpt = -1;
-            int minErr = -1;
+            double minErr = -1;
             Boolean first = true;
             foreach (TupleDInt kk in ETmy_t_err.Keys)
             {
-
-
-                //for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
-                //{
-
-
-                //  for (int m = 1; m <= (int)Math.Round((double)((N - 2) / tMin)); m++)
-                //{
-                // Tuple<int, int> tmp = new Tuple<int, int>(m, y);
-                if (kk.Item2 == y)
+                if (!weightsOn)
                 {
-                    if (first) { minErr = ETmy_t_err[kk].Item2; mOpt = kk.Item1; first = false; }
-                    //if (ETmy_t_err[tmp] != null)
-                    //{//CHECK IT!!!! IF null or -1???
-                    else if (minErr > ETmy_t_err[kk].Item2)
+                    if (kk.Item2 == y)
                     {
-                        mOpt = kk.Item1;
+                        if (first) { minErr = ETmy_t_err[kk].Item2; mOpt = kk.Item1; first = false; }                     
+                        else if (minErr > ETmy_t_err[kk].Item2)
+                        {
+                            mOpt = kk.Item1;
+                        }
+                    }
+                }
+                else
+                {
+
+                    if (kk.Item2 == y)
+                    {
+                        if (first) { minErr = ETmy_t_err[kk].Item2*weights[ETmy_t_err[kk].Item1]; mOpt = kk.Item1; first = false; }                
+                        else if (minErr > ETmy_t_err[kk].Item2 * weights[ETmy_t_err[kk].Item1])
+                        {
+                            mOpt = kk.Item1;
+                        }
                     }
                 }
             }
@@ -171,7 +142,7 @@ namespace OptimalDiscreteSlicing
 
 
 
-        public static List<int> getOptSlice(Tuple<int, int> startPoint, Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int tMin, int N)
+        public static List<int> getOptSlice(Tuple<int, int> startPoint, Dictionary<Tuple<int, int>, Tuple<int, int>> ETmy_t_err, int tMin, int N, Dictionary<int, double> weights)
         {
             List<int> path = new List<int>();
             Tuple<int, int> tmp = new Tuple<int, int>(startPoint.Item1, startPoint.Item2);
@@ -180,12 +151,11 @@ namespace OptimalDiscreteSlicing
             Boolean first = true;
             path.Add(startPoint.Item2);
 
-
             while (yNew > 1 || first)//Check if stop on 1 or 0!
             {
 
                 yNew = yNew - ETmy_t_err[tmp].Item1; //z-t
-                mNew = getOptMperConstY(ETmy_t_err, yNew, tMin, N);
+                mNew = getOptMperConstY(ETmy_t_err, yNew, tMin, N,weights);
                 path.Add(yNew);
                 if (first) first = false; else first = false;
                 tmp = new Tuple<int, int>(mNew, yNew);
@@ -340,11 +310,7 @@ namespace OptimalDiscreteSlicing
         public static void printVoxelizedRepresentation(Bitmap3 bmp, String outputPath)
         {
             VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
-            voxGen.Voxels = bmp;
-            //voxGen.ColorSourceF = (idx) =>
-            //{
-            //    return new Colorf((float)idx.x, (float)idx.y, (float)idx.z) * (1.0f / 4);
-            //};
+            voxGen.Voxels = bmp;      
             voxGen.Generate();
             DMesh3 voxMesh = voxGen.Meshes[0];
             Util.WriteDebugMesh(voxMesh, outputPath);
@@ -412,43 +378,73 @@ namespace OptimalDiscreteSlicing
             }
             return voxPrintResult;
         }
+        
 
         static void Main(string[] args)
         {
-            //string input=" ";
-            Console.WriteLine("Insert T: ");
-            string s = Console.ReadLine();
-            List<int> input = s.Split(' ').Select(t => Convert.ToInt32(t)).ToList<int>();
-            /*
-            while (input != "")
+          
+            Console.WriteLine("Enter path of model: ");
+            string pathToFile = Console.ReadLine();
+            Console.WriteLine("Weight Mode?(Y/N): ");
+            string answer = Console.ReadLine();
+            List<int> input= new List<int>();
+            Dictionary<int, double> weights = new Dictionary<int, double>();
+            if (answer.ToUpper() == "Y")
             {
-                Console.WriteLine("Please enter another integer: ");
-                input = Console.ReadLine().In;
-               
-                int.TryParse(input, out value))
-                numbersInput.Add(input);
-            }
-            */
-            HashSet<int> legitSliceHights = new HashSet<int>(input);
-           // legitSliceHights.Add(17);
-            //legitSliceHights.Add(3);
-           //legitSliceHights.Add(2);
-           // legitSliceHights.Add(4);
-            //legitSliceHights.Add(5);
-            //legitSliceHights.Add(9);
-            //legitSliceHights.Add(12);
+                int size = -1;
+                int enter = 1;  
+                while (enter>0) { 
+                    Console.WriteLine("Please enter slice size: ");
+                    size = Convert.ToInt32(Console.ReadLine());
+                    if(size <= 0)
+                    {
+                        enter = -1;
+                    }
+                    if (enter > 0)
+                    {
+                        Console.WriteLine("weight : ");
+                        if (!weights.ContainsKey(size) && enter > 0)
+                        {
+                            double wg = -1;
+                            wg = Convert.ToDouble(Console.ReadLine());
+                            if (wg > 0.0) {
+                                weights.Add(size, wg);
+                                input.Add(size);
+                            }
+                            else
+                            {
+                                Console.WriteLine("set default weight 1");
+                                weights.Add(size, 1);
+                                input.Add(size);
+                            }
+                        }
+                        
+                    }                    
 
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
+                }
+                weightsOn = true;
+            }
+            else
+            {
+                Console.WriteLine("Insert heights: ");
+                string s = Console.ReadLine();
+                input = s.Split(' ').Select(t => Convert.ToInt32(t)).ToList<int>();
+                weightsOn =false;
+            }
+         
+
+            HashSet<int> legitSliceHights = new HashSet<int>(input);
+            //"C:\\Users\\VladKo\\Downloads\\bunny.obj"
+            Bitmap3 bmp = createVoxelizedRepresentation(pathToFile);
             printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
             }
             Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp, legitSliceHights.Max(), legitSliceHights.Min());
-
             Dictionary<Tuple<int, int>, Tuple<int, int>> algResults = optDiscreteSlicingAlgo(errorAndSum.Item1, legitSliceHights, bmp.Dimensions.y);
             Tuple<int, int> startPoint = findStartPoint(algResults, bmp.Dimensions.y, legitSliceHights.Max(), legitSliceHights.Min());
-            List<int> path = getOptSlice(startPoint, algResults, legitSliceHights.Min(), bmp.Dimensions.y); //from top to bottom
+            List<int> path = getOptSlice(startPoint, algResults, legitSliceHights.Min(), bmp.Dimensions.y,weights); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x, path.First() - path.Last(), bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path, errorAndSum.Item2, newObjDim, bmp);
             printVoxelizedRepresentation(outputObj, "C:\\Users\\VladKo\\Downloads\\outputVox.obj");
