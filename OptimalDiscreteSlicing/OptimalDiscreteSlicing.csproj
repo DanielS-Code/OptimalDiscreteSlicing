@@ -33,16 +33,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
-      <HintPath>..\..\libreries\clipper_library.dll</HintPath>
+      <HintPath>..\Libreries\clipper_library.dll</HintPath>
     </Reference>
     <Reference Include="geometry3Sharp">
-      <HintPath>..\..\libreries\geometry3Sharp.dll</HintPath>
+      <HintPath>..\Libreries\geometry3Sharp.dll</HintPath>
     </Reference>
     <Reference Include="gsGCode">
-      <HintPath>..\..\libreries\gsGCode.dll</HintPath>
+      <HintPath>..\Libreries\gsGCode.dll</HintPath>
     </Reference>
     <Reference Include="gsSlicer">
-      <HintPath>..\..\libreries\gsSlicer.dll</HintPath>
+      <HintPath>..\Libreries\gsSlicer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

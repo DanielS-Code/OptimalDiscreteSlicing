@@ -225,20 +225,23 @@ namespace OptimalDiscreteSlicing
             Dictionary<Tuple<int, int>, int> errorDic = new Dictionary<Tuple<int, int>, int>(); //key: zi,zj value: total error
             Dictionary<Tuple<int, int, int, int>, int> sumDic = new Dictionary<Tuple<int, int, int, int>, int>(); //key: zi,zj,x,z value: sum
             List<int> intersectionList;
-            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y; zi++)
 
-            { //check ranges!
+            //zerro all errors
+            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y; zi++)
+            { 
                 for (int zj = zi; zj <= zi + tmax; zj++)
                 {
                     Tuple<int, int> key = new Tuple<int, int>(zi, zj);
                     errorDic[key] = 0;
                 }
             }
+            int sss = 0;
+            //run for each x and z (2D looking from top of object)
             for (int x = 0; x < bmp.Dimensions.x; x++)
             {
                 for (int z = 0; z < bmp.Dimensions.z; z++)
-                {                                               //run for each x and z (2D looking from top of object)
-                  
+                {                                            
+                  //calculate error and sum for specific x and y
                     intersectionList = getIntersections(x, z, bmp);
                     for (int k = 0; k < intersectionList.Count; k++)
                     {
@@ -266,23 +269,26 @@ namespace OptimalDiscreteSlicing
                                 s += (int)Math.Pow(-1, l) * (intersectionList[l - 1] - zj);
                                 Tuple<int, int, int, int> sumKey = new Tuple<int,int,int,int>(zi,zj,x,z);
                                 Tuple<int, int> key = new Tuple<int, int>(zi, zj);
-                                sumDic.Add(sumKey, s);
-                                int error = zj - zi - s;
-                                if (errorDic.ContainsKey(key)) //check if need to add prev error
+                                if (!sumDic.ContainsKey(sumKey)) //CHECK THIS OUT IT LOOKS BAD!!! (IN THE LOOK WE REPEAT CALCULATION FOR ZI,ZJ,X,Z!!!!
                                 {
-                                    errorDic[key] = errorDic[key] + error;
-                                }
-                                else
-                                {
-                                    errorDic[key] = error;
-                                }
+                                    sumDic.Add(sumKey, s);
+                                    int error = zj - zi - s;
+                                    if (errorDic.ContainsKey(key)) //check if need to add prev error
+                                    {
+                                        errorDic[key] = errorDic[key] + error;
+                                    }
+                                    else
+                                    {
+                                        errorDic[key] = error;
+                                    }    
+                                }                     
                             }
                         }
                     }
                 }
             }
-        
-                    return new Tuple<Dictionary<Tuple<int,int>,int>,Dictionary<Tuple<int,int,int,int>,int>>(errorDic,sumDic);
+                    
+            return new Tuple<Dictionary<Tuple<int,int>,int>,Dictionary<Tuple<int,int,int,int>,int>>(errorDic,sumDic);
         }
 
         public static Vector3i createVector(int x, int y, int z)
@@ -372,9 +378,10 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
-            legitSliceHights.Add(2);
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
+            legitSliceHights.Add(4);
+            //legitSliceHights.Add(5);
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
             if (test)
             {
                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
@@ -386,7 +393,7 @@ namespace OptimalDiscreteSlicing
             List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x,path.First()-path.Last(),bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
-            printVoxelizedRepresentation(outputObj,"C:\\Users\\VladKo\\Downloads\\outputVox.obj");
+            printVoxelizedRepresentation(outputObj, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
 
          }
     }
