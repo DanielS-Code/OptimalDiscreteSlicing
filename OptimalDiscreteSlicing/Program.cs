@@ -13,7 +13,7 @@ namespace OptimalDiscreteSlicing
     class Program
     {
 
-        static bool test =false;
+        static bool test =true;
 
         public static ErrDic optDiscreteSlicingAlgo(Dictionary<TupleDInt, int> errorDic, HashSet<int> height, int N)
         {
@@ -54,7 +54,7 @@ namespace OptimalDiscreteSlicing
                         //}
                         // if (errorDic.ContainsKey(tmp1))
                         //{
-                        errFromDic = errorDic[tmp1];
+                        errFromDic = errorDic[tmp1];//134 136
 
 
                         if (errInit + errFromDic < E[tmp2] && errInit != int.MaxValue)
@@ -220,16 +220,16 @@ namespace OptimalDiscreteSlicing
             return interList;
         }
 
-        public static Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> calcErrorAndSum(Bitmap3 bmp, int tmax)
+        public static Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> calcErrorAndSum(Bitmap3 bmp, int tmax, int tmin)
         {
             Dictionary<Tuple<int, int>, int> errorDic = new Dictionary<Tuple<int, int>, int>(); //key: zi,zj value: total error
             Dictionary<Tuple<int, int, int, int>, int> sumDic = new Dictionary<Tuple<int, int, int, int>, int>(); //key: zi,zj,x,z value: sum
             List<int> intersectionList;
 
             //zerro all errors
-            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y; zi++)
+            for (int zi = 1 - tmax; zi <= bmp.Dimensions.y+tmax; zi++)
             { 
-                for (int zj = zi; zj <= zi + tmax; zj++)
+                for (int zj = zi; zj <= Math.Min(zi + tmax,bmp.Dimensions.y+tmax); zj++)
                 {
                     Tuple<int, int> key = new Tuple<int, int>(zi, zj);
                     errorDic[key] = 0;
@@ -378,22 +378,23 @@ namespace OptimalDiscreteSlicing
 
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
-            legitSliceHights.Add(4);
-            //legitSliceHights.Add(5);
-            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
-            printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
+          // legitSliceHights.Add(2);
+            legitSliceHights.Add(5);
+            //legitSliceHights.Add(7);
+            Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\VladKo\\Downloads\\bunny.obj");
+            printVoxelizedRepresentation(bmp, "C:\\Users\\VladKo\\Downloads\\inputVox.obj");
             if (test)
             {
-                getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
+                 getIntersections(60, 50, bmp).ForEach(Console.WriteLine);
             }
-            Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp,legitSliceHights.Max());
+            Tuple<Dictionary<Tuple<int, int>, int>, Dictionary<Tuple<int, int, int, int>, int>> errorAndSum = calcErrorAndSum(bmp,legitSliceHights.Max(),legitSliceHights.Min());
            
             Dictionary<Tuple<int, int>, Tuple<int, int>> algResults =  optDiscreteSlicingAlgo(errorAndSum.Item1,legitSliceHights,bmp.Dimensions.y);
             Tuple<int, int> startPoint = findStartPoint(algResults,bmp.Dimensions.y,legitSliceHights.Max(),legitSliceHights.Min());
             List<int> path = getOptSlice(startPoint,algResults,legitSliceHights.Min(),bmp.Dimensions.y); //from top to bottom
             Vector3i newObjDim = createVector(bmp.Dimensions.x,path.First()-path.Last(),bmp.Dimensions.z);
             Bitmap3 outputObj = createNewObjectForPriniting(path,errorAndSum.Item2,newObjDim);
-            printVoxelizedRepresentation(outputObj, "C:\\Users\\Daniel\\Desktop\\outputVox.obj");
+            printVoxelizedRepresentation(outputObj, "C:\\Users\\VladKo\\Downloads\\outputVox.obj");
 
          }
     }
