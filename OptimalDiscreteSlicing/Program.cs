@@ -388,7 +388,7 @@ namespace OptimalDiscreteSlicing
                         Tuple<int, int, int, int> key = new Tuple<int, int, int, int>(zi, zj, x, z);
                         if ((sumDic.ContainsKey(key) && sumDic[key] >= 0) || isCoulumnInObj(oldObj, zi, zj, x, z))
                         {
-                            for (int y = zi; y <= zj; y++)
+                            for (int y = zi; y < zj; y++)
                             {
                                 voxPrintResult.Set(createVector(x, y, z), true);
                             }
@@ -405,10 +405,13 @@ namespace OptimalDiscreteSlicing
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
            // legitSliceHights.Add(17);
-           //legitSliceHights.Add(3);
+            legitSliceHights.Add(3);
            //legitSliceHights.Add(2);
-            //legitSliceHights.Add(7);
-            legitSliceHights.Add(17);
+            legitSliceHights.Add(7);
+            legitSliceHights.Add(5);
+            legitSliceHights.Add(9);
+            //legitSliceHights.Add(12);
+
             Bitmap3 bmp = createVoxelizedRepresentation("C:\\Users\\Daniel\\Desktop\\bunny.obj");
             printVoxelizedRepresentation(bmp, "C:\\Users\\Daniel\\Desktop\\inputVox.obj");
             if (test)
