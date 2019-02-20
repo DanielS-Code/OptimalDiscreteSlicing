@@ -353,15 +353,20 @@ namespace OptimalDiscreteSlicing
         public static bool isCoulumnInObj(Bitmap3 bmp, int zi, int zj, int x, int z)
         {
             bool visitedInObject = false;
-            for (int y = zi; y <= zj; y++)
+            for (int y = zi; y < zj; y++)
             {
                 if (y < 0)
                 {
                     continue;
                 }
-                if (y >= bmp.Dimensions.y && visitedInObject)
+                if (y >= bmp.Dimensions.y)
                 {
-                    return true;
+                    if(visitedInObject){
+                         return true;
+                    }
+                    else{
+                        return false;
+                    }
                 }
                 if (!bmp.Get(createVector(x,y, z)))
                 {
@@ -416,7 +421,7 @@ namespace OptimalDiscreteSlicing
            // legitSliceHights.Add(17);
             //legitSliceHights.Add(3);
            //legitSliceHights.Add(2);
-            legitSliceHights.Add(7);
+            legitSliceHights.Add(4);
             legitSliceHights.Add(5);
             legitSliceHights.Add(9);
             //legitSliceHights.Add(12);
