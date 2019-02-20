@@ -352,13 +352,14 @@ namespace OptimalDiscreteSlicing
 
         public static bool isCoulumnInObj(Bitmap3 bmp, int zi, int zj, int x, int z)
         {
+            bool visitedInObject = false;
             for (int y = zi; y <= zj; y++)
             {
                 if (y < 0)
                 {
                     continue;
                 }
-                if (y >= bmp.Dimensions.y)
+                if (y >= bmp.Dimensions.y && visitedInObject)
                 {
                     return true;
                 }
@@ -366,8 +367,17 @@ namespace OptimalDiscreteSlicing
                 {
                     return false;
                 }
+                else
+                {
+                    visitedInObject = true;
+                }
             }
-            return true;
+
+            if (visitedInObject)
+            {
+                return true;
+            }
+            return false;
         }
 
         public static Bitmap3 createNewObjectForPriniting(List<int> path, Dictionary<Tuple<int, int, int, int>, int> sumDic, Vector3i newObjDim, Bitmap3 oldObj)
@@ -405,7 +415,7 @@ namespace OptimalDiscreteSlicing
             Console.WriteLine("Insert T");
             HashSet<int> legitSliceHights = new HashSet<int>();
            // legitSliceHights.Add(17);
-            legitSliceHights.Add(3);
+            //legitSliceHights.Add(3);
            //legitSliceHights.Add(2);
             legitSliceHights.Add(7);
             legitSliceHights.Add(5);
